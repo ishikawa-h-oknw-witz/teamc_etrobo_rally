@@ -1,41 +1,40 @@
 #ifndef SCENARIO_RUNNER_H
 #define SCENARIO_RUNNER_H
 
+#include "DistanceCalculator.h"
+#include "PIDController.h"
+#include "Motor.h"
+#include "IMU.h"
+#include "Logger.h"
+
+#include <stdlib.h>
+
+using namespace spikeapi;
+
 class ScenarioRunner
 {
 public:
+    ScenarioRunner(
+            Motor& leftMotor,
+            Motor& rightMotor,
+            DistanceCalculator& distanceCalculator,
+            PIDController& pidController);
 
-    /**
-     * ETラリー1周実行
-     */
-    void run();
+    //基準速度の設定
+    void set_speed(int basespeed);
 
-    /**
-     * 指定ゲート攻略
-     */
-    void runGate(const GateInfo& gateInfo);
+    //前後退走行
+    void move(bool direction, int distance);
 
-private:
-
-    /**
-     * 基準点まで移動
-     */
-    void moveToBasePoint(BasePointColor targetColor);
-
-    /**
-     * ゲート攻略経路実行
-     */
-    void executeRoute(int gateNo);
-
-    /**
-     * 基準点へ帰還
-     */
-    void returnToBasePoint(BasePointColor targetColor, int gateNo);
+    //旋回
+    void turn(float targetHeading);
 
 private:
-
-    LineTracer& mLintracer
-    BasePointDetector& mBasePointDetector
-    DirectionController& mDirectionController;
+    Motor& mLeftMotor;
+    Motor& mRightMotor;
+    DistanceCalculator& mDistanceCalculator;
+    PIDController& mPIDController;
+    IMU mImu;
+    int mBaseSpeed;
 };
 #endif

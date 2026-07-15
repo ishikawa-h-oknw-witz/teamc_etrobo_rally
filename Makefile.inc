@@ -6,6 +6,8 @@ APPL_CXXOBJS += \
     control/DirectionController.o \
     control/TrapezoidController.o \
     runner/LineTracer.o \
+    runner/ScenarioRunner.o \
+    Logger.o \
 
 SRCLANG := c++
 

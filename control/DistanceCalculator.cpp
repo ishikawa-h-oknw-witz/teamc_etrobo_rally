@@ -17,10 +17,10 @@ void DistanceCalculator::reset()
 float DistanceCalculator::getDistance()
 {
     int leftAngle =
-        mLeftMotor.getCount();
+        abs(mLeftMotor.getCount());
 
     int rightAngle =
-        mRightMotor.getCount();
+        abs(mRightMotor.getCount());
 
     float averageAngle =
         (leftAngle + rightAngle) / 2.0f;

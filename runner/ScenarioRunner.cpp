@@ -1,79 +1,105 @@
 #include "ScenarioRunner.h"
 
-void ScenarioRunner::run()
+// コンストラクタ
+ScenarioRunner::ScenarioRunner(
+    Motor& leftMotor,
+    Motor& rightMotor,
+    DistanceCalculator& distanceCalculator,
+    PIDController& pidController)
+    : mLeftMotor(leftMotor),
+      mRightMotor(rightMotor),
+      mDistanceCalculator(distanceCalculator),
+      mPIDController(pidController),
+      mBaseSpeed(40)
 {
-    // 赤ゲート攻略
-
-    // 青ゲート攻略
-
-    // 黄ゲート攻略
 }
 
-void ScenarioRunner::runGate(const GateInfo& gateInfo)
+void ScenarioRunner::set_speed(int basespeed)
 {
-    // 目標基準点へ移動
-
-    moveToBasePoint(gateInfo.basePointColor);
-
-    // ゲート攻略
-
-    executeRoute(gateInfo.gateNo);
-
-    // 基準点へ帰還
-
-    returnToBasePoint(gateInfo.basePointColor, gateInfo.gateNo);
-}
-
-void ScenarioRunner::moveToBasePoint(BasePointColor targetColor)
-{
-    // ライントレース開始
-
-    // 指定色検知まで走行
-
-    // 停止
-}
-
-void ScenarioRunner::executeRoute(int gateNo)
-{
-    switch(gateNo)
+    if(basespeed > 100)
     {
-        case 1:
-            // 左端縦ゲート攻略
-            break;
-
-        case 2:
-            // ゲート②攻略
-            break;
-
-        case 3:
-            // ゲート③攻略
-            break;
-
-        default:
-            break;
+        mBaseSpeed = 100;
+    }
+    else if(basespeed < 0)
+    {
+        mBaseSpeed = 0;
+    }
+    else{
+        mBaseSpeed = basespeed;
     }
 }
 
-void ScenarioRunner::returnToBasePoint(BasePointColor targetColor, int gateNo)
+void ScenarioRunner::move(bool direction, int distance)
 {
-    // 基準線へ帰還
+    mImu.resetHeading();
+    mDistanceCalculator.reset();
+    float targetHeading = mImu.getHeading();
 
-    // 基準点再検知
-    switch(gateNo)
-    {
-        case 1:
-            // 左端縦ゲート攻略
-            break;
+    mPIDController.setGain(
+        5.0,
+        0.0,
+        0.2);
 
-        case 2:
-            // ゲート②攻略
-            break;
+    while(mDistanceCalculator.getDistance() < distance){
+        float currentHeading = mImu.getHeading();
+        int error = targetHeading - currentHeading;
+        int correction = mPIDController.calculate(error);
 
-        case 3:
-            // ゲート③攻略
-            break;
-
-        default:
-            break;
+        if(direction == true){
+                mLeftMotor.setPower(mBaseSpeed + correction);
+                mRightMotor.setPower(mBaseSpeed - correction);
+        }
+        else{
+            mLeftMotor.setPower(-mBaseSpeed - correction);
+            mRightMotor.setPower(-mBaseSpeed + correction);
+        }
     }
+    mLeftMotor.stop();
+    mRightMotor.stop();
+}
+
+void ScenarioRunner::turn(float targetHeading)
+{
+    mImu.resetHeading();
+
+    mPIDController.setGain(
+        0.6,
+        0.0,
+        0.2);
+
+    while (true)
+    {
+        float currentHeading = mImu.getHeading();
+
+        Logger::printf("currentHeading = %.2f\n", currentHeading);
+
+        float error = targetHeading - currentHeading;
+
+        Logger::printf("error = %.2f\n", error);
+
+        if (abs(error) < 0.5f) {    // ±1°以内になったら終了
+            break;
+        }
+
+        int turnPower = abs(mPIDController.calculate(error));  // 比例制御
+
+        if (turnPower > 40) {
+            turnPower = 40;  // 最大出力制限
+        }
+
+        if (turnPower < 25) {
+            turnPower = 25;   // 動き出せる最低出力
+        }
+
+        if (error > 0) {
+            mLeftMotor.setPower(turnPower);
+            mRightMotor.setPower(-turnPower);
+        }
+        else {
+            mLeftMotor.setPower(-turnPower);
+            mRightMotor.setPower(turnPower);
+        }
+    }
+    mLeftMotor.stop();
+    mRightMotor.stop();
 }

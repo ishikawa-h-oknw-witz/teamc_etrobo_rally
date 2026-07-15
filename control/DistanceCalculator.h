@@ -3,6 +3,8 @@
 
 #include "Motor.h"
 
+#include <stdlib.h>
+
 using namespace spikeapi;
 
 class DistanceCalculator
