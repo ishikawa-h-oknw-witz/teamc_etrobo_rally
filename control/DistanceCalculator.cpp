@@ -1,4 +1,5 @@
 #include "DistanceCalculator.h"
+#include <stdlib.h>
 
 DistanceCalculator::DistanceCalculator(
     Motor& leftMotor,

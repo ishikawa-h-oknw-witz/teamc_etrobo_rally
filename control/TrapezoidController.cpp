@@ -2,7 +2,7 @@
 
 TrapezoidController::TrapezoidController()
     : mStartSpeed(30),
-      mMaxSpeed(60),
+      mMaxSpeed(100),
       mEndSpeed(30),
       mAccelDistance(100.0f),
       mDecelDistance(100.0f)

@@ -11,7 +11,7 @@ extern "C" {
 
 /* タスク周期の定義 */
 //#define LINE_TRACER_PERIOD  (100 * 1000) /* ライントレースタスク:100msec周期 */
-#define LOGGER_PERIOD  (1000 * 1000) /* ログタスク:1sec周期 */
+#define LOGGER_PERIOD  (100 * 1000) /* ログタスク:1sec周期 */
 
 #ifndef STACK_SIZE
 #define STACK_SIZE      4096

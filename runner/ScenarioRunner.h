@@ -1,15 +1,12 @@
 #ifndef SCENARIO_RUNNER_H
 #define SCENARIO_RUNNER_H
 
+#include "Motor.h"
 #include "DistanceCalculator.h"
 #include "PIDController.h"
-#include "Motor.h"
-#include "IMU.h"
-#include "kernel.h"
-#include "Clock.h"
 #include "TrapezoidController.h"
-
-#include <stdlib.h>
+#include "IMU.h"
+#include "Clock.h"
 
 using namespace spikeapi;
 
@@ -22,9 +19,6 @@ public:
             DistanceCalculator& distanceCalculator,
             PIDController& pidController,
             TrapezoidController& trapezoidController);
-
-    //基準速度の設定
-    void set_speed(int basespeed);
 
     //前後退走行
     void move(bool direction, int distance);

@@ -1,21 +1,20 @@
 #include "app.h"
-#include "kernel.h"
+#include "kernel.h"                 //タスク系
 #include "LineTracer.h"
 #include "PIDController.h"
+#include "TrapezoidController.h"
 #include "DistanceCalculator.h"
 #include "ScenarioRunner.h"
 #include "Motor.h" 
 #include "ForceSensor.h" 
 #include "ColorSensor.h"
-#include "TrapezoidController.h"
 #include "Logger.h"
 #include "Battery.h"
+#include "Clock.h"
 #include "kernel_cfg.h"
 
 #include <stdio.h>
 #include <string.h>
-
-#include "Clock.h"
 
 using namespace spikeapi;
 
@@ -43,6 +42,8 @@ LineTracer lineTracer(leftWheel, rightWheel, colorSensor, pidController);
 DistanceCalculator distanceCalculator(leftWheel, rightWheel);
 ScenarioRunner scenarioRunner(leftWheel, rightWheel, distanceCalculator, pidController, trapezoidController);
 Logger logger(colorSensor, leftWheel, rightWheel);
+/* インスタンス生成ここまで */
+
 
 //{走行距離(mmまで), 走行速度, 比例ゲイン, 積分ゲイン, 微分ゲイン}
 struct Section {
@@ -65,6 +66,7 @@ Section sections[] = {
     {5400, 100, 0.6, 0.0, 0.2}   //区間８　直進　約100cm
 };
 
+/* ログタスク */
 extern "C" {
 
 void logger_task(intptr_t exinf)
@@ -75,13 +77,14 @@ void logger_task(intptr_t exinf)
 
 }
 
+/* メインタスク */
 void main_task(intptr_t exinf)
 {
-    /* Bluetooth初期化＆接続待ち */
+    /* Bluetooth初期化＆接続待ち＆ログタスク起動100msec周期 */
     logger.init();
     sta_cyc(LOGGER_TASK_CYC);
 
-    /* 初期化 */
+    /* ボタン押下フラグ */
     bool measuring = false;
 
     while (!forceSensor.isTouched());

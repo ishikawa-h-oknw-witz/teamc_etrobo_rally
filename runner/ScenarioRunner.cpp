@@ -1,4 +1,6 @@
 #include "ScenarioRunner.h"
+#include "kernel.h"
+#include <stdlib.h>
 
 // コンストラクタ
 ScenarioRunner::ScenarioRunner(
@@ -14,21 +16,6 @@ ScenarioRunner::ScenarioRunner(
       mTrapezoidController(trapezoidController),
       mBaseSpeed(60)
 {
-}
-
-void ScenarioRunner::set_speed(int basespeed)
-{
-    if(basespeed > 100)
-    {
-        mBaseSpeed = 100;
-    }
-    else if(basespeed < 0)
-    {
-        mBaseSpeed = 0;
-    }
-    else{
-        mBaseSpeed = basespeed;
-    }
 }
 
 void ScenarioRunner::move(bool direction, int distance)
