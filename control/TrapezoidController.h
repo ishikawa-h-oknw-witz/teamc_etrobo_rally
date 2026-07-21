@@ -1,17 +1,18 @@
-using namespace Controll{
+#ifndef TRAPEZOID_CONTROLLER_H
+#define TRAPEZOID_CONTROLLER_H
 
-    class TrapezoidController { 
-        public:
-        TrapezoidController(spikeapi::Clock clock);
-        void startControll();
-        int getControllValue();
+class TrapezoidController { 
+public:
+    TrapezoidController(int startSpeed, int maxSpeed, int rampDistance);
 
-        private:
-        int time;
-        int startValue;
-        int maxValue;
-        int stopValue;
-        int maxslope;
+    int calculate(int currentDistance, int targetDistance);
 
-    }
-}
+    void setMaxSpeed(int maxSpeed);
+
+private:
+    int mStartSpeed;
+    int mMaxSpeed;
+    int mRampDistance;
+};
+
+#endif

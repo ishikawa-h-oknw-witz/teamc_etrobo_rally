@@ -11,7 +11,7 @@ LineTracer::LineTracer(
       mColorSensor(colorSensor),
       mPIDController(pidController),
       mTargetReflection(50),
-      mBaseSpeed(30)
+      mBaseSpeed(60)
 {
 }
 
@@ -41,4 +41,6 @@ void LineTracer::run()
  
     mRightMotor.setPower(
         mBaseSpeed + turn);
+
+    tslp_tsk(10*1000);   // 約10ms周期
 }

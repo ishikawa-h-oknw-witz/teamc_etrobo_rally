@@ -4,6 +4,7 @@
 #include "ColorSensor.h"
 #include "PIDController.h"
 #include "Motor.h"
+#include "kernel.h"
 
 using namespace spikeapi;
 

@@ -17,17 +17,24 @@ void PIDController::setGain(float kp, float ki, float kd)
     mKd = kd;
 }
 
-int PIDController::calculate(int error)
+void PIDController::reset()
 {
+    mIntegral = 0.0f;
+    mPreviousError = 0.0f;
+}
+
+float PIDController::calculate(float error)
+{
+    float dt = 0.01f;
+    
     // 積分項更新
     mIntegral += error;
  
     // 微分項計算
-    int diff =
-        error - mPreviousError;
+    float diff = (error - mPreviousError) / dt;
  
     // PID計算
-    int turn =
+    float turn =
         mKp * error +
         mKi * mIntegral +
         mKd * diff;

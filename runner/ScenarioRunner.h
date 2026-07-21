@@ -6,6 +6,9 @@
 #include "Motor.h"
 #include "IMU.h"
 #include "Logger.h"
+#include "kernel.h"
+#include "Clock.h"
+#include "TrapezoidController.h"
 
 #include <stdlib.h>
 
@@ -35,6 +38,7 @@ private:
     DistanceCalculator& mDistanceCalculator;
     PIDController& mPIDController;
     IMU mImu;
+    Clock mClock;
     int mBaseSpeed;
 };
 #endif

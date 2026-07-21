@@ -8,7 +8,9 @@ public:
     
     void setGain(float kp, float ki, float kd);
     
-    int calculate(int error);
+    float calculate(float error);
+
+    void reset();
  
 private:
     float mKp;
@@ -17,7 +19,7 @@ private:
  
     float mIntegral;
  
-    int mPreviousError;
+    float mPreviousError;
 };
  
 #endif
