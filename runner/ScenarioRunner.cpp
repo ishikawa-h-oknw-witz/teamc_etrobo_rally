@@ -5,11 +5,13 @@ ScenarioRunner::ScenarioRunner(
     Motor& leftMotor,
     Motor& rightMotor,
     DistanceCalculator& distanceCalculator,
-    PIDController& pidController)
+    PIDController& pidController,
+    TrapezoidController& trapezoidController)
     : mLeftMotor(leftMotor),
       mRightMotor(rightMotor),
       mDistanceCalculator(distanceCalculator),
       mPIDController(pidController),
+      mTrapezoidController(trapezoidController),
       mBaseSpeed(60)
 {
 }
@@ -35,8 +37,6 @@ void ScenarioRunner::move(bool direction, int distance)
     mDistanceCalculator.reset();        //距離リセット 
     mPIDController.reset();             //微分項リセット  
 
-    mBaseSpeed = direction ? 40 : -40;  //前進と後退の速度設定
-
     // 直進用PID
     mPIDController.setGain(
         3.0,
@@ -44,28 +44,32 @@ void ScenarioRunner::move(bool direction, int distance)
         0.0);
 
     while(mDistanceCalculator.getDistance() < distance){
-        /*int speed = mTrapezoid.calculate(
-            currentDistance,
-            distance);*/
+        float current =
+            mDistanceCalculator.getDistance();
+
+        int speed =
+            mTrapezoidController.getSpeed(
+                current,
+                distance
+            );
+
+        // 後退の場合は速度を負にする
+        if(!direction)
+        {
+            speed = -speed;
+        }
 
         float heading = mImu.getHeading();
-
-        Logger::printf("error = %.2f\n", heading);
         
         // 目標角度は0°
         float error = 0.0f - heading;
         float correction = mPIDController.calculate(error);
-        
-        Logger::printf("correction = %.2f\n", correction);
 
         int leftPower = 0;
         int rightPower = 0;
 
-        leftPower  = mBaseSpeed + correction;
-        rightPower = mBaseSpeed - correction;
-
-        Logger::printf("leftMotor = %d\n", leftPower);
-        Logger::printf("rightMotor = %d\n", rightPower);
+        leftPower  = speed + correction;
+        rightPower = speed - correction;
 
         // PWM制限
         if (leftPower > 100) leftPower = 100;
@@ -98,11 +102,7 @@ void ScenarioRunner::turn(float targetHeading)
     {
         float currentHeading = mImu.getHeading();
 
-        Logger::printf("currentHeading = %.2f\n", currentHeading);
-
         float error = targetHeading - currentHeading;
-
-        Logger::printf("error = %.2f\n", error);
 
         if (abs(error) < 0.5f) {    // ±1°以内になったら終了
             break;

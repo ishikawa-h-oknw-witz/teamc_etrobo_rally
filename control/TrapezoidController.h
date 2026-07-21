@@ -1,18 +1,27 @@
-#ifndef TRAPEZOID_CONTROLLER_H
-#define TRAPEZOID_CONTROLLER_H
+#ifndef TRAPEZOIDCONTROLLER_H
+#define TRAPEZOIDCONTROLLER_H
 
-class TrapezoidController { 
+class TrapezoidController
+{
 public:
-    TrapezoidController(int startSpeed, int maxSpeed, int rampDistance);
+    TrapezoidController();
 
-    int calculate(int currentDistance, int targetDistance);
+    void setParameter(
+        int startSpeed,
+        int maxSpeed,
+        int endSpeed,
+        float accelDistance,
+        float decelDistance);
 
-    void setMaxSpeed(int maxSpeed);
+    int getSpeed(float currentDistance, float totalDistance);
 
 private:
     int mStartSpeed;
     int mMaxSpeed;
-    int mRampDistance;
+    int mEndSpeed;
+
+    float mAccelDistance;
+    float mDecelDistance;
 };
 
 #endif

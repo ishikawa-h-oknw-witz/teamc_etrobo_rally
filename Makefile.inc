@@ -3,7 +3,6 @@ mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 APPL_CXXOBJS += \
     control/PIDController.o \
     control/DistanceCalculator.o \
-    control/DirectionController.o \
     control/TrapezoidController.o \
     runner/LineTracer.o \
     runner/ScenarioRunner.o \

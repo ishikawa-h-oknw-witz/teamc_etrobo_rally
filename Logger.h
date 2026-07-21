@@ -1,17 +1,39 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <cstdarg>
-#include <cstdio>
+#include "Motor.h"
+#include "IMU.h"
+#include "ColorSensor.h"
 
-#include <syssvc/serial.h>
-#include <spike/hub/bluetooth.h>
+using namespace spikeapi;
 
 class Logger
 {
 public:
+    Logger(ColorSensor& colorSensor,
+           Motor& leftMotor,
+           Motor& rightMotor);
+
+    void output();
+
     static void init();
     static void printf(const char* fmt, ...);
+
+private:
+    ColorSensor& mColorSensor;
+    Motor& mLeftMotor;
+    Motor& mRightMotor;
+    IMU mImu;
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void logger_task(intptr_t exinf);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -5,7 +5,6 @@
 #include "PIDController.h"
 #include "Motor.h"
 #include "IMU.h"
-#include "Logger.h"
 #include "kernel.h"
 #include "Clock.h"
 #include "TrapezoidController.h"
@@ -21,7 +20,8 @@ public:
             Motor& leftMotor,
             Motor& rightMotor,
             DistanceCalculator& distanceCalculator,
-            PIDController& pidController);
+            PIDController& pidController,
+            TrapezoidController& trapezoidController);
 
     //基準速度の設定
     void set_speed(int basespeed);
@@ -37,6 +37,7 @@ private:
     Motor& mRightMotor;
     DistanceCalculator& mDistanceCalculator;
     PIDController& mPIDController;
+    TrapezoidController& mTrapezoidController;
     IMU mImu;
     Clock mClock;
     int mBaseSpeed;

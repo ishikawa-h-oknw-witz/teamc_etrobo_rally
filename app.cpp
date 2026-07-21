@@ -7,8 +7,10 @@
 #include "Motor.h" 
 #include "ForceSensor.h" 
 #include "ColorSensor.h"
+#include "TrapezoidController.h"
 #include "Logger.h"
 #include "Battery.h"
+#include "kernel_cfg.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -35,10 +37,12 @@ ColorSensor colorSensor(EPort::PORT_E);
 Clock clock;
 
 PIDController pidController;
+TrapezoidController trapezoidController;
 
 LineTracer lineTracer(leftWheel, rightWheel, colorSensor, pidController);
 DistanceCalculator distanceCalculator(leftWheel, rightWheel);
-ScenarioRunner scenarioRunner(leftWheel, rightWheel, distanceCalculator, pidController);
+ScenarioRunner scenarioRunner(leftWheel, rightWheel, distanceCalculator, pidController, trapezoidController);
+Logger logger(colorSensor, leftWheel, rightWheel);
 
 //{走行距離(mmまで), 走行速度, 比例ゲイン, 積分ゲイン, 微分ゲイン}
 struct Section {
@@ -61,10 +65,21 @@ Section sections[] = {
     {5400, 100, 0.6, 0.0, 0.2}   //区間８　直進　約100cm
 };
 
+extern "C" {
+
+void logger_task(intptr_t exinf)
+{
+    logger.output();
+    ext_tsk();
+}
+
+}
+
 void main_task(intptr_t exinf)
 {
     /* Bluetooth初期化＆接続待ち */
-    Logger::init();
+    logger.init();
+    sta_cyc(LOGGER_TASK_CYC);
 
     /* 初期化 */
     bool measuring = false;
@@ -153,12 +168,12 @@ void main_task(intptr_t exinf)
                 }
             }*/
 
-            scenarioRunner.move(true, 40);
+            scenarioRunner.move(true, 1000);
             tslp_tsk(100000);
             scenarioRunner.turn(90);
             tslp_tsk(100000);
 
-            for(int no = 8; no <= 13; no++)
+            /*for(int no = 8; no <= 13; no++)
             {
                 runGate(no);
                 while (!forceSensor.isTouched());
@@ -166,7 +181,7 @@ void main_task(intptr_t exinf)
                 tslp_tsk(100000);
                 scenarioRunner.turn(90);
                 tslp_tsk(100000);
-            }
+            }*/
    
             break;
         }

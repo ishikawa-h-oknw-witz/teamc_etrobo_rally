@@ -1,52 +1,50 @@
 #include "TrapezoidController.h"
 
-TrapezoidController::TrapezoidController(
+TrapezoidController::TrapezoidController()
+    : mStartSpeed(30),
+      mMaxSpeed(60),
+      mEndSpeed(30),
+      mAccelDistance(100.0f),
+      mDecelDistance(100.0f)
+{
+}
+
+void TrapezoidController::setParameter(
     int startSpeed,
     int maxSpeed,
-    int rampDistance)
-    : mStartSpeed(startSpeed),
-      mMaxSpeed(maxSpeed),
-      mRampDistance(rampDistance)
+    int endSpeed,
+    float accelDistance,
+    float decelDistance)
 {
+    mStartSpeed = startSpeed;
+    mMaxSpeed = maxSpeed;
+    mEndSpeed = endSpeed;
+    mAccelDistance = accelDistance;
+    mDecelDistance = decelDistance;
 }
 
-void TrapezoidController::setMaxSpeed(int maxSpeed)
+int TrapezoidController::getSpeed(
+    float currentDistance,
+    float totalDistance)
 {
-    if(maxSpeed > 100)
-    {
-        mMaxSpeed = 100;
-    }
-    else if(maxSpeed < 0)
-    {
-        mMaxSpeed = 0;
-    }
-    else{
-        mMaxSpeed = maxSpeed;
-    }
-}
+    float remainingDistance = totalDistance - currentDistance;
 
-int TrapezoidController::calculate(
-    int currentDistance,
-    int targetDistance)
-{
-    int remainDistance = targetDistance - currentDistance;
-
-    // 加速
-    if (currentDistance < mRampDistance)
+    // 加速区間
+    if (currentDistance < mAccelDistance)
     {
         return mStartSpeed +
             (mMaxSpeed - mStartSpeed)
-            * currentDistance / mRampDistance;
+            * currentDistance / mAccelDistance;
     }
 
-    // 減速
-    if (remainDistance < mRampDistance)
+    // 減速区間
+    if (remainingDistance < mDecelDistance)
     {
-        return mStartSpeed +
-            (mMaxSpeed - mStartSpeed)
-            * remainDistance / mRampDistance;
+        return mEndSpeed +
+            (mMaxSpeed - mEndSpeed)
+            * remainingDistance / mDecelDistance;
     }
 
-    // 等速
+    // 定速区間
     return mMaxSpeed;
 }

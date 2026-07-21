@@ -1,5 +1,21 @@
 #include "Logger.h"
 
+#include <cstdarg>
+#include <cstdio>
+
+#include <syssvc/serial.h>
+#include <spike/hub/bluetooth.h>
+
+Logger::Logger(
+    ColorSensor& colorSensor,
+    Motor& leftMotor,
+    Motor& rightMotor)
+    : mColorSensor(colorSensor),
+      mLeftMotor(leftMotor),
+      mRightMotor(rightMotor)
+{
+}
+
 void Logger::init()
 {
     bool connected = false;
@@ -29,4 +45,27 @@ void Logger::printf(const char* fmt, ...)
     va_end(args);
 
     serial_wri_dat(2, buffer, len);
+}
+
+void Logger::output()
+{
+    ColorSensor::HSV hsv;
+    mColorSensor.getHSV(hsv);
+
+    printf(
+        "Heading=%.2f "
+        "Ref=%d "
+        "H=%d S=%d V=%d "
+        "L=%d R=%d\r\n",
+
+        mImu.getHeading(),
+        mColorSensor.getReflection(),
+
+        hsv.h,
+        hsv.s,
+        hsv.v,
+
+        mLeftMotor.getPower(),
+        mRightMotor.getPower()
+    );
 }
